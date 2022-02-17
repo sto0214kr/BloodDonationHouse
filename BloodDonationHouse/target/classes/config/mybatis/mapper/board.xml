@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="b">
+
+	<!-- 공지사항 전체 목록 조회 -->
+	<select id="board_list" resultType="com.korea.house.vo.BoardVO" parameterType="java.util.HashMap">
+		select * from 
+			(select RANK() OVER(order by idx desc) no, b.*
+			from (select * from board) b)
+			where no between #{s} and #{e}
+	</select>
+	
+	<!-- 공지사항 글 등록 -->
+	<insert id="board_insert" parameterType="com.korea.house.vo.BoardVO">
+		insert into board values (
+				seq_board_idx.nextVal,
+				#{title},
+				#{content},
+				#{writer},
+				0,
+				sysdate)
+	</insert>
+	
+	<!-- 공지사항 상세 페이지 -->
+	<select id="board_one" resultType="com.korea.house.vo.BoardVO" parameterType="int">
+		select * from board where idx=#{idx}
+	</select>
+	
+	<!-- 공지사항 수정 -->
+	<update id="board_update" parameterType="com.korea.house.vo.BoardVO">
+		update board set title=#{title}, content=#{content}, writer=#{writer} where idx=#{idx}
+	</update>
+	
+	<!-- 공지사항 삭제 -->
+	<delete id="board_delete" parameterType="int">
+		delete from board where idx=#{idx}
+	</delete>
+	
+	<!-- 조회수 증가 -->
+	<update id="board_readnum" parameterType="int">
+		update board set readnum=readnum+1 where idx=#{idx}
+	</update>
+	
+	<!-- 전체 게시물의 수 -->
+	<select id="board_count" resultType="int">
+		select count(*) from board
+	</select>
+
+</mapper>
